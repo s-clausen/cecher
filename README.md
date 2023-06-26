@@ -9,8 +9,8 @@ The Cecher is a C++ software developed for efficient computation of Čech persis
 
   - a core persistence algorithm adapted from the C++ code of the ultrafast [Ripser], featuring its support for coefficients in prime fields, its memory-efficient philosophy, and use of a combination of cohomology, clearing, and zero-apparent pairs shortcut
   - a version of the union-find algorithm in [Ripser] with compression
-  - a symbolic perturbation of the Čech filtration, allowing to skip the construction of many columns of the coboundary matrix (and with them the corresponding zero-persistence pairs)
-  - a novel minimal enclosing sphere implementation, featuring efficient computation in high ambient dimensions and outperforming in the context of a persistence algorithm established software like [Miniball].
+  - a symbolic perturbation of the Čech filtration, allowing to skip the construction of many columns of the coboundary matrix corresponding to zero-persistence pairs
+  - a novel minimal enclosing sphere implementation, featuring efficient computation in high ambient dimensions and outperforming established software like [Miniball] in the context of a persistence algorithm 
   - and a lazy-exact computation, primarily computing with an interval arithmetic type, and recomputing with an rational exact type when necessary 
 
 
