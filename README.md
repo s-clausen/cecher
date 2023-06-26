@@ -34,7 +34,7 @@ The implementation currently utilizes the (double-precision) interval arithmetic
 The Cecher supports the following preprocessor macros:
 
   - `USE_COEFFICIENTS`: enable support for coefficients in a prime field Z/*p*Z (default: *p*=2).
-  - `EXPLICIT_CENTERS`: variant of the minimal enclosing sphere algorithm, can boost performance in low ambient dimensions
+  - `EXPLICIT_CENTERS`: enable variant of the minimal enclosing sphere algorithm, boosts performance in low ambient dimensions
 
 
 The Cecher supports the following program argument (can be passed in the file name):
