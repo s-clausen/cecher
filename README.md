@@ -14,7 +14,7 @@ The Cecher is a C++ software developed for efficient computation of Čech persis
   - and a lazy-exact computation, primarily computing with an interval arithmetic type, and recomputing with an rational exact type when necessary 
 
 
-### General Position Assumption for Efficient Computation
+### Assumption for Efficient Computation
 
 The Cecher is efficient on noisy 'real world data' (more specifically on datasets in *d*-dimensional Euclidean space, where all simplices of dimension *d* or lower are affinely independent and have distinct minimal circumspheres with distinct radii). The implementation is robust to violation of this assumption.
 
