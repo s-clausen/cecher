@@ -37,7 +37,7 @@ The Cecher supports the following preprocessor macros:
   - `EXPLICIT_CENTERS`: enable variant of the minimal enclosing sphere algorithm, boosts performance in low ambient dimensions
 
 
-The Cecher supports the following program argument (can be passed in the file name):
+The Cecher supports the following program arguments (can be passed in the file name):
 
   - `--dim k`: compute persistent homology up to dimension *k* (default: *k*=1).
   - `--threshold t`: compute Čech filtration up to radius *t* (default: no threshold).
