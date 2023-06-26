@@ -16,7 +16,7 @@ The Cecher is a C++ software for efficient computation of Čech persistence barc
 
 ### Assumption for Efficient Computation
 
-The Cecher is robust to degenerate input, but can be slow on flat simplices or when minimal circumspheres of simplices have coinciding radii. This is because in this case the algorithm will require in parts an exact computation. However on most 'real world data' all operations will be performed with the interval arithmetic type instead.
+The Cecher is robust to degenerate input, but can be slowed down by flat simplices or when minimal circumspheres of simplices have coinciding radii, since these point configurations require exact computations. However on most 'real world data' all operations will be performed with the interval arithmetic type instead.
 
 
 ### Input Format
