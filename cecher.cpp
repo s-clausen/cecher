@@ -1,29 +1,15 @@
 /*
- Cecher: efficient & robust C++ code for computation of Cech-persistence barcodes
- 2023, Soenke Lars Clausen
-
- Adapted from Ripser (a lean computation of Vietoris-Rips-persistence https://github.com/Ripser/ripser) it features the
- same 'bag of tricks', allowing persistence computation without the computation of the full (co-)boundary matrix and
- minimal memory access. Additionally, the Cecher utilizes a symbolic perturbation specifically developed to reduce
- computational effort, while ensuring robustness to degenerate input.
- The Cech-complex is constructed using an internal algorithm combining the ideas of the advanced minimal enclosing ball
- algorithm in https://people.inf.ethz.ch/gaertner/subdir/texts/own_work/esa99_final.pdf with the possibility to
- construct circumspheres using the Cayley-Menger matrix to compute the coboundary of a simplex efficiently even in high
- dimensions.
-
- The algorithm follows the 'lazy-exact' approach in computational geometry and primarily computes utilizing an interval
- arithmetic type (an exact type is swapped in whenever necessary). This ensures numerical robustness, while allowing
- for efficient computations. Number types are included from https://www.cgal.org/ (header-only).
-
+ Cecher: efficient computation of Čech persistence barcodes
+ 2023, Soenke Clausen
 */
 
 
 #define EXPLICIT_CENTERS
 //#define USE_RATIONALS
 //#define USE_COEFFICIENTS
-#define INDICATE_PROGRESS
+//#define INDICATE_PROGRESS
 #define PRINT_PERSISTENCE_PAIRS
-#define DEBUG
+//#define DEBUG
 //#define USE_ROBINHOOD_HASHMAP
 
 
@@ -131,7 +117,6 @@ index_t step_count= 0;
 auto start = std::chrono::steady_clock::now();
 #endif
 const char* filename = nullptr;
-//new support type (index,dim) pair
 typedef std::pair<index_t,int> index_dim_t;
 
 #ifdef USE_COEFFICIENTS
@@ -144,7 +129,6 @@ struct entry_t {
 	entry_t() : index(0), coefficient(0) {}
 };
 
-//static_assert(sizeof(entry_t) == sizeof(index_t), "size of entry_t is not the same as index_t");
 
 entry_t make_entry(index_t i, coefficient_t c) { return entry_t(i, c); }
 index_t get_index(const entry_t& e) { return e.index; }
@@ -174,7 +158,6 @@ index_t get_index(const index_diameter_t& i) { return i.first; }
 PT get_diameter(const index_diameter_t& i) { return i.second; }
 
 
-//minimal enclosing ball algorithm return type
 template <typename T> struct ball_t : std::pair<T,index_dim_t>{
     ball_t(T _diameter, index_dim_t _support) : std::pair<T,index_dim_t> { _diameter,_support} {}
 };
@@ -192,7 +175,6 @@ struct diameter_entry_t : std::tuple<PT, entry_t, index_dim_t> {
     diameter_entry_t(const diameter_index_t& p)
             : diameter_entry_t(get_diameter(p), make_entry(get_index(p), 0),index_dim_t(get_index(p),1)) {}
     diameter_entry_t(const index_t& _index) : diameter_entry_t(0, _index, 0) {}
-    //ball_t conversion to diameter_entry_t
     diameter_entry_t(ball_t<PT> _ball, index_t _index, coefficient_t _coefficient)
             : diameter_entry_t(_ball.first, make_entry(_index, _coefficient),_ball.second) {}
 #ifndef USE_RATIONALS
@@ -216,10 +198,8 @@ void set_coefficient(diameter_entry_t& p, const coefficient_t c) {
 }
 
 
-//upper triangular matrix
 template <typename T> struct upper_tri_mtx: std::vector<std::vector<T>>{};
 
-//products & related methods
 template <typename T> std::vector<T> mtx_vector_product(const upper_tri_mtx<T>& M,const std::vector<T>& v){
     std::vector<T> result (v.size());
     for (int i=0; i<v.size(); i++) {
@@ -403,32 +383,28 @@ public:
 };
 
 
-//miniball-algorithm (3 types) & circumsphere (returns cayley-menger inverse)
+
 template <typename T> class min_ball {
 
     const std::vector<std::vector<T>>& points;
     const table& binomial_coeff;
     const distance_matrix& dist;
 
-    //miniball
     bool is_assembly,init_coboundary;
     int idx, dim, m;
     std::vector<index_t> vertices;
     std::vector<int> indices;
 
-    //cayley-menger
     std::vector<std::vector<upper_tri_mtx<T>>> cache;
     upper_tri_mtx<T> prev_CM_inv, CM_inv;
     T diameter, radius;
     std::vector<T> center;
 
-    //cache
     upper_tri_mtx<T> simplex_CM_inv;
     std::vector<int> simplex_indices;
     std::vector<T> simplex_center;
     T simplex_diameter, simplex_radius;
 
-    //symbolic perturbation
     std::vector<index_dim_t> known_intvs;
     bool new_predicates;
     std::vector<T> radii;
@@ -499,7 +475,6 @@ public:
 
 
     void reset(const std::vector<index_t>& _vertices, const int& j, const bool simplex_cache=false) {
-        //reset variables
         vertices=_vertices;
         if (j!=-1) vertices.push_back(j);
         known_intvs.resize(0);
@@ -518,7 +493,6 @@ public:
 
 
     void update_indices_idx_dim(bool pushing_a_vertex=false) {
-        //update current indices (represented by the pair (idx,dim))
         indices = colexicographic_subsequent(m);
         if (idx<binomial_coeff(m,dim+1)-1) idx++;
         else {
@@ -548,13 +522,11 @@ public:
     upper_tri_mtx<T> compute_CM_inv(const upper_tri_mtx<T>& prev_CM_inv,const std::vector<T>& CM_col) {
         upper_tri_mtx<T> result;
 
-        //compute my & z
         std::vector<T> my = mtx_vector_product(prev_CM_inv, CM_col);
         T z = -1 * inner_product(CM_col, my);
         if (z==0) return result;
         T z_inv = 1/z;
 
-        //compute CM's inverse
         result = prev_CM_inv;
         std::vector<T> CM_inv_col = my;
         for (int i=0; i<CM_inv_col.size(); i++) CM_inv_col[i] *= -z_inv;
@@ -577,22 +549,17 @@ public:
 
 
     void next_circumsphere() {
-        //computes diameter (dim=1) or CM_inv & radius (dim=2)
         if (dim==1) diameter=get_dist(vertices[indices[0]],vertices[indices[1]]);
         else {
-            //retrieve cache
             prev_CM_inv= cache[dim-2][idx- binomial_coeff(indices[dim],dim+1)];
 
-            //skip if previous support is affine dependent
             if (prev_CM_inv.size() == 0) {
                 CM_inv.resize(0);
                 return;
             }
 
-            //compute CM's last column
             std::vector<T> CM_col=next_CM_column(vertices[indices[dim]],dim);
 
-            //compute CM's inverse & extract radius
             CM_inv=compute_CM_inv(prev_CM_inv,CM_col);
             if(CM_inv.size()>0) radius=compute_radius(CM_inv);
         }
@@ -600,25 +567,20 @@ public:
 
 
     void get_predicates() {
-        //prepares relevant spheres in (radii,centers)
         new_predicates=false;
 
-        //reset
         centers.clear();
         radii.clear();
 
         for (int d=0; d<dim-1;d++){
 
-            //retrieve cache
             int facet_idx=idx- binomial_coeff(indices[dim],dim+1);
             upper_tri_mtx<T> CM_inv = cache[dim-d-2][facet_idx];
             std::vector<T> center = compute_center(CM_inv,dim-d);
 
-            //check if circumsphere useful, otherwise push add. point
             if (compute_dist(points[vertices[indices[dim-d]]], center)
                 == compute_radius(CM_inv)) {
 
-                //push an add. point
                 std::vector<T> push_point (point_dim);
                 for (int l=0; l< point_dim; l++) {
                     push_point[l]= points[vertices[indices[dim-d]]][l]/2
@@ -630,7 +592,6 @@ public:
                 }
                 CM_inv=compute_CM_inv(CM_inv,CM_col);
 
-                //re-compute center
                 center = compute_center(CM_inv,dim-d);
                 for (int i = 0; i < point_dim; i++) center[i] += push_point[i] * CM_inv[dim-d+1][0];
             }
@@ -643,15 +604,12 @@ public:
 
 
     bool is_in_sphere(const index_t& vertex) {
-        //checks if 'vertex' lies inside the (perturbed) ball
         if (dim==1) {
             T orientation= -diameter;
             for (int i=0; i<2; i++) orientation+=get_dist(vertices[indices[i]],vertex);
             return (orientation<0 || orientation==0 && (vertex>vertices[indices[0]] || vertex>vertices[indices[1]]));
         }
-        //check if 'vertex' lies inside the (unperturbed) ball
 #ifndef EXPLICIT_CENTERS
-        //push vertex & compute lambda_max
         std::vector<T> CM_col=next_CM_column(vertex,dim+1);
         std::vector<T> my=mtx_vector_product(CM_inv,CM_col);
         T minus_z=inner_product(CM_col,my);
@@ -668,17 +626,13 @@ public:
 #endif
         if (new_predicates) get_predicates();
 
-        //determine which points of on_sphere lie inside the perturbed ball
         int dim=indices.size()-1;
         for (int d=0; d<dim;d++)  {
 
-            //1-facet: perturbed ball determined by total order
             if(d==dim-1) return (vertex>vertices[indices[dim-d]]);
 
-            //points must be of higher order than opposing vertex
             if (vertex<vertices[indices[dim-d]]) return false;
 
-            //points must lie in or on sphere
             margin=compute_dist(points[vertex], centers[d]);
             if (margin<radii[d]) return false;
             if (margin>radii[d]) return true;
@@ -687,14 +641,12 @@ public:
 
 
     bool is_optimal() {
-        //checks if the circumsphere is minimal
         for (int k=0; k< indices.size();k++) if (CM_inv[k+1][0]<0) return false;
         return true;
     }
 
 
     bool is_valid(){
-        //checks if the (perturbed) ball encloses all points
         new_predicates=true;
 #ifdef EXPLICIT_CENTERS
         if (dim>1) center=compute_center(CM_inv,dim+1);
@@ -708,10 +660,8 @@ public:
             }
         }
 
-        //shortcut if all points are enclosed
         if (in_sphere.size()==vertices.size()-dim-1) return true;
 
-        //construct the perturbed interval
         std::vector<std::vector<int>> intv;
         intv.push_back(indices);
         for (int i=0; i<in_sphere.size(); i++) {
@@ -730,7 +680,6 @@ public:
 
 
     bool has_zero_cofacet(){
-        //search for zero cofacets
         new_predicates=true;
 #ifdef EXPLICIT_CENTERS
         if (dim>1) center=compute_center(CM_inv,dim+1);
@@ -753,7 +702,6 @@ public:
 
 
     ball_t<T> construct(const std::vector<index_t>& _vertices, const index_t j=-1) {
-        //reset & for symbolic perturbation arrange vertices in descending order
         reset(_vertices, j);
         std::reverse(vertices.begin(),vertices.end());
         std::sort(vertices.begin(),vertices.end(),std::greater<index_t>());
@@ -761,9 +709,8 @@ public:
         while (true){
             next_circumsphere();
 
-            //test if sphere is optimal & is a perturbed support & is valid
             if(dim==m-1 || (dim==1 && is_valid()) || (dim>1 && CM_inv.size()>0 && is_optimal() &&
-                                                      std::find(known_intvs.begin(), known_intvs.end(), index_dim_t{idx,dim})==known_intvs.end() && is_valid())){
+                      std::find(known_intvs.begin(), known_intvs.end(), index_dim_t{idx,dim})==known_intvs.end() && is_valid())){
 
                 index_t support=0;
                 if (is_assembly && (dim < m-1 || has_zero_cofacet())) support=-1;
@@ -772,7 +719,6 @@ public:
                 return ball_t<T>((dim>1)? radius*4: diameter,index_dim_t {support, dim});
             }
 
-            //store cache & update idx,dim,indices
             store_circumsphere(false);
             update_indices_idx_dim();
         }
@@ -780,21 +726,18 @@ public:
 
 
     void construct_simplex_cache(const std::vector<index_t>& _vertices) {
-        //reset
         reset(_vertices, -1);
         bool ball_found =false;
 
         while (true){
             next_circumsphere();
 
-            //test if sphere is optimal & is a perturbed support & is valid
             if(!ball_found && (dim==m-1 || (dim==1 && is_valid()) || (dim>1 && CM_inv.size()>0 && is_optimal() &&
-                                                                      std::find(known_intvs.begin(), known_intvs.end(), index_dim_t{idx,dim})==known_intvs.end() && is_valid()))){
+                   std::find(known_intvs.begin(), known_intvs.end(), index_dim_t{idx,dim})==known_intvs.end() && is_valid()))){
 
 #ifdef EXPLICIT_CENTERS
                 if (dim>1) center=compute_center(CM_inv,dim+1);
 #endif
-                //simplex cache
                 simplex_CM_inv = CM_inv;
                 simplex_indices = indices;
                 simplex_center = center;
@@ -803,7 +746,6 @@ public:
                 ball_found=true;
             }
 
-            //store cache & update idx,dim,indices
             store_circumsphere();
             if (dim==m-1) {
                 m++;
@@ -816,7 +758,6 @@ public:
 
     ball_t<T> construct_cofacet(const std::vector<index_t>& _vertices, const index_t j=-1) {
 
-        //reset & set simplex idx,dim,indices
         reset(_vertices, j, true);
 
         indices=simplex_indices;
@@ -828,14 +769,12 @@ public:
 #ifndef EXPLICIT_CENTERS
         CM_inv=simplex_CM_inv;
 #endif
-        //check if the simplex & cofacet a zero pair
         if (!init_coboundary && is_in_sphere(j)){
             index_t support=0;
             if (is_assembly) support=-1;
             else support=compute_support_index();
             return ball_t<T>((dim>1)? radius*4: diameter, index_dim_t {support, dim});
         }
-        //reset idx,dim,indices
         indices.resize(2);
         indices[0]=0;
         indices[1]=m-1;
@@ -846,8 +785,7 @@ public:
             if(dim==1 ||(dim>1 && std::find(known_intvs.begin(), known_intvs.end(), index_dim_t{idx,dim})==known_intvs.end())){
                 next_circumsphere();
 
-                //test if sphere is optimal & is a perturbed support & is valid
-                if(dim==m-1 || (dim==1 && is_valid()) || (dim>1 && CM_inv.size()>0 && is_optimal() && is_valid())){
+		if(dim==m-1 || (dim==1 && is_valid()) || (dim>1 && CM_inv.size()>0 && is_optimal() && is_valid())){
 
                     index_t support=0;
                     if (is_assembly && (dim < m-1 || has_zero_cofacet())) support=-1;
@@ -857,15 +795,12 @@ public:
                 }
             }
 
-
-            //update idx,dim,indices
             update_indices_idx_dim(true);
         }
     }
 
 
     upper_tri_mtx<T> circumsphere(const std::vector<index_t>& _vertices) {
-        //re-computes the circumsphere of a known (perturbed) support
         reset(_vertices, -1);
 
         while (true){
@@ -879,7 +814,6 @@ public:
 };
 
 
-//lazy exact distances
 template<> PT min_ball<PT>::get_dist(const index_t& a, const index_t& b){
     return dist(a,b);
 }
@@ -889,7 +823,6 @@ template<> ET min_ball<ET>::get_dist(const index_t& a, const index_t& b){
 }
 #endif
 
-//if predicate near zero fail to an exact type
 #ifndef USE_RATIONALS
 template<> void min_ball<CGAL::Interval_nt<>>::throw_to_exact_type(){
     throw CGAL::Uncertain_conversion_exception("");
@@ -897,7 +830,6 @@ template<> void min_ball<CGAL::Interval_nt<>>::throw_to_exact_type(){
 #endif
 template<> void min_ball<CGAL::Exact_rational>::throw_to_exact_type(){}
 
-//lean miniball-algorithm for 2-simplices
 template <typename T> class min_2_ball {
 
     const table &binomial_coeff;
@@ -927,14 +859,12 @@ public:
     }
 
     ball_t<PT> construct(const std::vector<index_t>& _vertices, const index_t& j,const index_t& cofacet_index){
-        //reset
         vertices=_vertices;
         vertices.push_back(j);
         index_t support;
 
         std::vector<PT> edges {dist(j,vertices[1]),dist(j,vertices[0]),get_diameter(simplex)};
 
-        //during initialization (simplex,cofacet) are non-zero
         PT cofacet_diameter = edges[2-init_coboundary];
         int max_edge_index = 2-init_coboundary;
 
@@ -945,20 +875,17 @@ public:
             }
         }
 
-        //check if the (perturbed) sphere encloses all points
         PT orientation = -edges[max_edge_index];
         for (int i = 0; i < 3; i++) if (i != max_edge_index) orientation += edges[i];
 
         if (orientation == 0 && is_smallest_index(vertices[max_edge_index])) max_edge_index=-1;
         else if (orientation > 0) {
-            //construct the 2-circumsphere
             PT auxiliary = 4;
             for (int i = 0; i < 3; i++) if (i != max_edge_index) auxiliary *= edges[i];
             cofacet_diameter = (edges[max_edge_index]*auxiliary) / (auxiliary-(orientation*orientation));
             max_edge_index=-1;
         }
 
-        //support index
         if (max_edge_index==-1) support= cofacet_index;
         else if (max_edge_index==2) support= get_index(simplex);
         else support = compute_1_support(j,vertices[(max_edge_index==0)? 1 : 0]);
@@ -1050,14 +977,12 @@ public:
                 get_simplex_vertices(get_index(simplex), dim, n, vertices.rbegin(), binomial_coeff);
                 get_simplex_vertices(get_supp_index(simplex), get_supp_dim(simplex), n, support.rbegin(), binomial_coeff);
 
-                //find vertex of the highest order which is not in the support
                 index_t facet_index=0, highest_vertex=0, k=0;
                 for (int i=0;i<vertices.size();i++) {
                     if (k<support.size() && vertices[i]==support[k]) k++;
                     else highest_vertex=vertices[i];
                 }
 
-                //construct youngest zero apparent facet
                 std::vector<index_t> facet;
                 for (int i=0;i<dim+1;i++) if (vertices[i]!=highest_vertex) facet.push_back(vertices[i]);
                 std::sort(facet.begin(), facet.end());
@@ -1070,7 +995,6 @@ public:
     }
 
 
-    //lazy exact implementation of a threshold
     template <typename T> bool is_lower(const T& diameter,const T& threshold){
         try{return (diameter<=threshold);}
         catch(CGAL::Uncertain_conversion_exception) {return true;}
@@ -1299,14 +1223,12 @@ public:
 
             reduction_matrix.append_column();
 
-            //comparator via lambda allowing efficient re-computations
             auto cmp = [&](const diameter_entry_t& a, const diameter_entry_t& b) {
                 return cofacets.greater_diameter_or_smaller_index(a,b, dim+1, false);
             };
 
             std::priority_queue<diameter_entry_t, std::vector<diameter_entry_t>,
                     decltype(cmp)> working_coboundary(cmp);
-            //working_reduction_column is a stack (requires no sorting)
             std::stack<diameter_entry_t> working_reduction_column;
 
             diameter_entry_t f, pivot = init_coboundary_and_get_pivot(
@@ -1418,7 +1340,6 @@ template <> class cecher<distance_matrix>::simplex_coboundary_enumerator {
     const mtx_ET& points_ET;
     int dim;
 
-    //minimal enclosing ball & lazy exact
     min_ball<PT> min_ball_PT;
     min_ball<ET> min_ball_ET;
     min_2_ball<PT> min_2_ball_PT;
@@ -1433,7 +1354,6 @@ public:
                                                            min_ball_ET(min_ball<ET>(points_ET,binomial_coeff,dist)),
                                                            min_2_ball_PT(min_2_ball<PT>(binomial_coeff,dist)){}
 
-    //helper methods for greater_diameter_or_smaller_index (perturbed filtration)
     bool is_subset(const std::vector<index_t>& supp_a,  const std::vector<index_t>& supp_b) {
         int l=0;
         for (int k=0; k< supp_a.size(); k++) {
@@ -1450,7 +1370,6 @@ public:
         }
     }
 
-    //greater (perturbed & squared) diameter or smaller index (lazy-exact)
     bool greater_diameter_or_smaller_index(const diameter_entry_t& a, const diameter_entry_t& b,
                                            const index_t dim, const bool is_assembly) {
 
@@ -1467,7 +1386,6 @@ public:
                 recomputation_count++;
 
 #endif
-                //construct support
                 std::vector<index_t> supp_a(get_supp_dim(a)+1), supp_b(get_supp_dim(b)+1);
                 get_simplex_vertices(get_supp_index(a), get_supp_dim(a), parent.n, supp_a.rbegin(), binomial_coeff);
                 get_simplex_vertices(get_supp_index(b), get_supp_dim(b), parent.n, supp_b.rbegin(), binomial_coeff);
@@ -1482,7 +1400,6 @@ public:
                     return (supp_a[0]<supp_b[0] || (supp_a[0]==supp_b[0] && supp_a[1]<supp_b[1]));
                 }
 
-                //shortcut: subsets
                 if (supp_a.size()<supp_b.size() && is_subset(supp_a,supp_b)) return false;
                 if (supp_b.size()<supp_a.size() && is_subset(supp_b,supp_a)) return true;
 #ifdef USE_RATIONALS
@@ -1492,18 +1409,15 @@ public:
                 int i1=0,i2=1,j1=0,j2=1;
                 while (true) {
 
-                    //skip zero-coefficients
                     while (i1 < supp_a.size()+1 && CM_inv_a[i2][i1]==0) next_indices(i1,i2,supp_a.size());
                     while (j1 < supp_b.size()+1 && CM_inv_b[j2][j1]==0) next_indices(j1,j2,supp_b.size());
 
-                    //check if additional coefficients vanish
                     if (i1>0 && j1==0) return false;
                     if (j1==0 && j1>0) return true;
                     if (i1==supp_a.size()&& j1<supp_b.size()) return (CM_inv_b[j2][j1]>0);
                     if (i1<supp_a.size()&& j1==supp_b.size()) return (CM_inv_a[i2][i1]<0);
                     if (i1==supp_a.size()&& j1==supp_b.size()) return(get_index(a) < get_index(b));
 
-                    //compare indices
                     if (i1==0 && supp_a[i2-1]!=supp_b[j2-1]) return (supp_a[i2-1]<supp_b[j2-1]);
                     if (i1>0 && (supp_a[i1-1]>supp_b[j1-1] || (supp_a[i1-1]==supp_b[j1-1] && supp_a[i2-1]>supp_b[j2-1]))) {
                         return (CM_inv_b[j2][j1]>0);
@@ -1512,11 +1426,9 @@ public:
                         return (CM_inv_a[i2][i1]<0);
                     }
 
-                    //compare values
                     if (i1==0 && CM_inv_a[i2][i1]!=CM_inv_b[j2][j1]) return (CM_inv_a[i2][i1]>CM_inv_b[j2][j1]);
                     if (i1>0 && CM_inv_a[i2][i1]!=CM_inv_b[j2][j1]) return (CM_inv_a[i2][i1]<CM_inv_b[j2][j1]);
 
-                    //values and indices coincide
                     next_indices(i1,i2,supp_a.size());
                     next_indices(j1,j2,supp_b.size());
                 }
@@ -1541,7 +1453,6 @@ public:
         min_ball_ET.set(is_assembly,init_coboundary);
         min_ball_PT.set(is_assembly,init_coboundary);
         min_2_ball_PT.set(_simplex,init_coboundary);
-        //construct simplex cache (CM of face-circumspheres)
 #ifndef USE_RATIONALS
         if (dim>1 || (dim>0) && is_assembly && has_next(false)) {
             try {min_ball_PT.construct_simplex_cache(vertices);}
@@ -1564,22 +1475,20 @@ public:
             assert(k != -1);
         }
 
-        //update index and coefficient of 'cofacet'
         index_t cofacet_index = idx_above + binomial_coeff(j, k + 1) + idx_below;
         coefficient_t cofacet_coeff =
                 (k & 1 ? modulus - 1 : 1) * get_coefficient(simplex) % modulus;
 
-        //construct Cech-complex (lazy-exact) utilizing simplex cache
         if (simplex_degenerate) return diameter_entry_t(min_ball_ET.construct(vertices,j--), cofacet_index, cofacet_coeff);
         try {
             if (dim>1 || (dim>0) && is_assembly) {
 #ifdef USE_RATIONALS
                 return diameter_entry_t(min_ball_PT.construct(vertices, j--), cofacet_index, cofacet_coeff);
 #else
-                return diameter_entry_t(min_ball_PT.construct_cofacet(vertices, j--), cofacet_index,  cofacet_coeff); //todo
+                return diameter_entry_t(min_ball_PT.construct_cofacet(vertices, j--), cofacet_index,  cofacet_coeff);
 #endif
             }
-            else return diameter_entry_t(min_2_ball_PT.construct(vertices, j--,cofacet_index),cofacet_index, cofacet_coeff); //todo
+            else return diameter_entry_t(min_2_ball_PT.construct(vertices, j--,cofacet_index),cofacet_index, cofacet_coeff); 
         }
         catch(CGAL::Uncertain_conversion_exception) {
             recomputation_count++;
@@ -1614,7 +1523,6 @@ template <> void cecher<distance_matrix>::get_edges(std::vector<diameter_index_t
 
         if (!use_threshold ||is_lower(length,threshold)) {
 
-            //compressed union-find
             all_edges.push_back({ length, index });
             bool is_apparent=false;
             for (index_t l = n-1; l >=0; --l) {
@@ -1639,7 +1547,6 @@ template <> void cecher<distance_matrix>::get_edges(std::vector<diameter_index_t
             }
             if (is_apparent==false) edges.push_back({ length, index });
         }
-        //reverse colexicographic order
         if (vertices[0]==0) {
             --vertices[1];
             vertices[0]=vertices[1]-1;
@@ -1648,7 +1555,6 @@ template <> void cecher<distance_matrix>::get_edges(std::vector<diameter_index_t
     }
 }
 
-//read rational point data & convert to primary type PT
 template <typename T> class read_convert {
 public:
     static T convert_from_rational(const ET cofacet_diameter);
@@ -1774,7 +1680,6 @@ int main(int argc, char** argv) {
     }
     distance_matrix dist = read_file(filename ? file_stream : std::cin);
 
-    //read both (primary & exact) types into memory
     std::ifstream file_stream_ET(filename);
     mtx_ET points_ET=read_convert<ET>::read_points(filename ? file_stream_ET : std::cin);
     std::ifstream file_stream_PT(filename);
