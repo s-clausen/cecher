@@ -40,8 +40,8 @@ Cecher supports the following preprocessor macros:
 
 The following options can be passed in the file name or as program argument:
 
-  - `--dim k`: compute persistent homology up to dimension *k* (default *k*=1).
-  - `--modulus p`: compute homology with coefficients in the finite prime field Z/*p*Z (when built with `USE_COEFFICIENTS`, default *p*=2).
+  - `--dim k`: compute persistent homology up to dimension *k* (default: *k*=1).
+  - `--modulus p`: compute homology with coefficients in the finite prime field Z/*p*Z (when built with `USE_COEFFICIENTS`, default: *p*=2).
   - `--threshold t`: compute Čech filtration up to radius *t* (default: no threshold ).
 
 
