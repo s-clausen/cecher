@@ -7,8 +7,8 @@ Copyright © 2023 Sönke Clausen
 
 The Cecher is a C++ software developed for efficient computation of Čech persistence barcodes. It heavily outperforms current software ([Dionysus], [GUDHI]) and is especially adapted to handle high ambient dimensions. Its main features are:
 
-  - a core persistence algorithm adapted from the C++ code of the ultrafast [Ripser], featuring its memory-efficient philosophy, its support for coefficients in prime fields and use of a combination of cohomology, clearing, and zero-apparent pairs shortcut
-  - a version of the union-find algorithm in [Ripser] featuring compression
+  - a core persistence algorithm adapted from the C++ code of the ultrafast [Ripser], featuring its support for coefficients in prime fields, its memory-efficient philosophy, and use of a combination of cohomology, clearing, and zero-apparent pairs shortcut
+  - a version of the union-find algorithm in [Ripser] with compression
   - a symbolic perturbation of the Čech filtration, allowing to skip the construction of many columns of the coboundary matrix (and with them the corresponding zero-persistence pairs)
   - a novel minimal enclosing sphere implementation, featuring efficient computation in high ambient dimensions and outperforming in the context of a persistence algorithm established software like [Miniball].
   - and a lazy-exact computation, primarily computing with an interval arithmetic type, and recomputing with an rational exact type when necessary 
@@ -21,7 +21,7 @@ The Cecher is efficient on noisy 'real world data' (more specifically on dataset
 
 ### Input Format
 
-Currently supported is an input in the form of a rational point cloud, where numerator and denominator are seperated by a forward-slash, and values are seperated by a comma ([examples]).
+Currently supported is an input in the form of a rational point cloud, where numerator and denominator are seperated by a forward-slash, and values are seperated by a whitespace ([examples]).
 
 
 ### Dependencies 
