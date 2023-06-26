@@ -4,7 +4,7 @@
 */
 
 
-#define EXPLICIT_CENTERS
+//#define EXPLICIT_CENTERS
 //#define USE_RATIONALS
 //#define USE_COEFFICIENTS
 //#define INDICATE_PROGRESS
