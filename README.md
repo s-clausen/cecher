@@ -12,7 +12,7 @@ The Cecher is a C++ software for efficient computation of Čech persistence barc
   - a symbolic perturbation of the Čech filtration, allowing to completely skip the construction of many columns of the coboundary matrix corresponding to zero-persistence pairs
   - a novel minimal enclosing sphere implementation, outperforming established software like [Miniball] in the context of a persistence algorithm and featuring efficient computation in high ambient dimensions
   - a lazy-exact type computation, where computations are performed primarily with an interval arithmetic type
-  - 
+    
 
 ### Assumption for Efficient Computation
 
