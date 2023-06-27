@@ -49,7 +49,7 @@ The Cecher supports the following program arguments (can be passed in the file n
 
 
 [Dionysus]: <http://www.mrzv.org/software/dionysus/>
-[GUDHI]: <http://gudhi.gforge.inria.fr>
+[GUDHI]: <https://gudhi.inria.fr/>
 [Ripser]: <https://github.com/Ripser/ripser>
 [CGAL]: <https://github.com/CGAL/cgal>
 [Miniball]: <https://people.inf.ethz.ch/gaertner/subdir/software/miniball.html>
