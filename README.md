@@ -1,6 +1,6 @@
 # Cecher
 
-Copyright © 2023 Sönke Clausen
+Copyright © 08.07.2023 Sönke Clausen
 
 
 ### Description
