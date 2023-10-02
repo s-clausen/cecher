@@ -2,9 +2,6 @@
 
 Copyright © 08.07.2023 Sönke Clausen
 
-
-### Description
-
 The Cecher is a C++ software for efficient computation of Čech persistence barcodes. It outperforms current software ([Dionysus], [GUDHI]) and is especially adapted to handle high ambient dimension. Its main features are:
 
   - a core persistence algorithm adapted from the C++ code of the ultrafast [Ripser], featuring its support for coefficients in prime fields, its memory-efficient philosophy, and use of a combination of cohomology, clearing, and zero-apparent pairs shortcut.
