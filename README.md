@@ -5,8 +5,11 @@ Copyright © 08.07.2023 Sönke Clausen
 The Cecher is a C++ software for efficient computation of Čech persistence barcodes outperforming current software. Its main features are:
 
   - a core persistence algorithm adapted from the C++ code of the ultrafast [Ripser], featuring its memory-efficient philosophy, and use of a combination of cohomology, clearing, and zero-apparent pairs shortcut.
+    
   - a symbolic perturbation of the Čech filtration, allowing to completely skip the construction of many columns of the boundary matrix corresponding to zero-persistence pairs.
-  - a minimal enclosing sphere algorithm especially efficient in high ambient dimension, outperforming established software like [Miniball] in the context of a persistence algorithm with a construction using the distance matrix.  
+    
+  - a minimal enclosing sphere algorithm especially efficient in high ambient dimension, outperforming established software like [Miniball] in the context of a persistence algorithm with a construction using the distance matrix.
+    
   - a lazy-exact implementation, where computations are performed primarily with an interval arithmetic type.
     
 
