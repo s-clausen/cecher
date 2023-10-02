@@ -1,4 +1,4 @@
-# Cecher
+![Cecher](logo.png)
 
 Copyright © 08.07.2023 Sönke Clausen
 
