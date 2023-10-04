@@ -18,12 +18,12 @@ The Cecher is a C++ software for efficient computation of Čech persistence barc
 
 The Cecher currently supports an input in the form of a rational point cloud, where numerator and denominator are seperated by a forward-slash, and values are seperated by a whitespace ([examples]). The input is given in a file whose name is passed as a command line argument. 
 
-The Cecher supports the following preprocessor macros:
+The following preprocessor macros are supported:
 
   - `USE_COEFFICIENTS`: enable support for coefficients in a prime field Z/*p*Z (default: *p*=2).
   - `EXPLICIT_CENTERS`: enable variant of the minimal enclosing sphere algorithm for low ambient dimension.
 
-The Cecher supports the following command line arguments:
+The following command line arguments are supported:
 
   - `--dim k`: compute persistent homology up to dimension *k* (default: *k*=1).
   - `--threshold t`: compute Čech filtration up to radius *t* (default: no threshold).
