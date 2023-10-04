@@ -37,7 +37,7 @@ examples/set_0.txt --dim 2
 
 ### Lazy-Exact Implementation
 
-The Cecher falls back on exact computations when flat simplices exist or when minimal circumspheres of simplices have coinciding radii. On most 'real world data' all operations utilize the interval arithmetic (double-precision float) type.
+The Cecher falls back on exact computations when flat simplices exist or when minimal circumspheres of simplices have coinciding radii. On most 'real world data' all operations utilize the interval arithmetic (double-precision) type.
 
 ### Dependencies 
 
