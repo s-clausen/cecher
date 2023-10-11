@@ -2,11 +2,14 @@ cmake_minimum_required(VERSION 3.23)
 project(cecher)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+
+set(CMAKE_BUILD_TYPE Release)
 
 find_package(CGAL REQUIRED)
 
 add_executable(cecher cecher.cpp)
+
+target_compile_definitions(cecher PRIVATE -DNDEBUG)
 
 target_link_libraries(cecher CGAL::CGAL)
 
