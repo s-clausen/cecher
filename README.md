@@ -13,8 +13,10 @@ The Cecher is a C++ software for efficient computation of Čech persistence barc
   - a lazy-exact implementation, where computations are performed primarily with an interval arithmetic type.
 
   - a version of the union-find algorithm in [Ripser] with compression.
+
+
     
-### Input/Options
+### Input & Options
 
 The Cecher currently supports an input in the form of a rational point cloud, where numerator and denominator are seperated by a forward-slash, and values are seperated by a whitespace ([examples]). The input is given in a file whose name is passed as a command line argument. 
 
@@ -29,12 +31,6 @@ The following command line arguments are supported:
   - `--threshold t`: compute Čech filtration up to radius *t* (default: no threshold).
   - `--modulus p`: compute homology with coefficients in the prime field Z/*p*Z (requires `USE_COEFFICIENTS`).
 
-Command line arguments example:
-
-```sh
-examples/set_0.txt --dim 2
-```
-
 ### Lazy-Exact Implementation
 
 The Cecher falls back on exact computations when flat simplices exist or when minimal circumspheres of simplices have coinciding radii. On most 'real world data' all operations utilize the interval arithmetic (double-precision) type.
@@ -42,6 +38,20 @@ The Cecher falls back on exact computations when flat simplices exist or when mi
 ### Dependencies 
 
 The Cecher depends on the library [CGAL] for its lazy-exact implementation. 
+
+### How to Build & Run
+
+On a preconfigured system (Windows, macOS or Linux, where [CGAL] and its dependencies are installed) building and running the Cecher should be as easy as:
+
+```sh
+cd path\to\cecher
+cmake -DUSE_COEFFICIENTS=off -DEXPLICIT_CENTERS=off .
+make
+.\cecher examples/set_0.txt --dim 2
+
+```
+Adapt preprocessor macros and program arguments to your needs.
+
 
 ### Credits 
 
