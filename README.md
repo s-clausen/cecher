@@ -47,7 +47,7 @@ On a preconfigured system (Windows, macOS or Linux, where [CGAL] and its depende
 cd path\to\cecher
 cmake -DUSE_COEFFICIENTS=off -DEXPLICIT_CENTERS=off .
 make
-.\cecher examples/set_0.txt --dim 2
+.\cecher examples\set_0.txt --dim 2
 
 ```
 Adapt preprocessor macros and program arguments to your needs.
