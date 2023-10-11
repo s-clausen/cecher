@@ -2,7 +2,7 @@
 
 Copyright © 08.07.2023 Sönke Clausen
 
-The Cecher is a C++ software for efficient computation of Čech persistence barcodes outperforming current software ([Dionysus],[GUDHI]). Its main features are:
+The Cecher is a C++ software for efficient computation of Čech persistence barcodes outperforming current software ([Dionysus], [GUDHI]). Its main features are:
 
   - a core persistence algorithm adapted from the C++ code of the ultrafast [Ripser], featuring its memory-efficient philosophy, and use of a combination of cohomology, clearing, and zero-apparent pairs shortcut.
     
@@ -49,7 +49,7 @@ Thank you to Ulrich Bauer and Fabian Roll for their contributions.
 
 
 [Ripser]: <https://github.com/Ripser/ripser>
-[CGAL]: <https://github.com/CGAL/cgal>
+[CGAL]: <https://www.cgal.org/download.html>
 [Dionysus]: <http://www.mrzv.org/software/dionysus/>
 [GUDHI]: <https://gudhi.inria.fr/>
 [Miniball]: <https://people.inf.ethz.ch/gaertner/subdir/software/miniball.html>
