@@ -18,7 +18,7 @@ The Cecher is a C++ software for efficient computation of Čech persistence barc
     
 ### Input & Options
 
-The Cecher currently supports an input in the form of a rational point cloud, where numerator and denominator are seperated by a forward-slash, and values are seperated by a whitespace ([examples]). The input is given in a file whose name is passed as a command line argument. 
+The Cecher supports an input in the form of a decimal point cloud, where a whitespace seperates values ([examples]). The input is given in a file whose name is passed as a command line argument. 
 
 The following preprocessor macros are supported:
 
@@ -47,7 +47,7 @@ On a preconfigured system (Windows, macOS or Linux, where [CGAL] and its depende
 cd path\to\cecher
 cmake -DUSE_COEFFICIENTS=off -DEXPLICIT_CENTERS=off .
 make
-.\cecher examples\set_0.txt --dim 2
+.\cecher examples\dragon.txt --dim 2
 
 ```
 Adapt preprocessor macros and program arguments to your needs.
