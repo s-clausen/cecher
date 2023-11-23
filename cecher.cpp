@@ -12,7 +12,6 @@
 //#define DEBUG
 //#define USE_ROBINHOOD_HASHMAP
 
-
 #include <algorithm>
 #include <cassert>
 #include <chrono>
@@ -1639,7 +1638,7 @@ template <typename T> class read_convert {
 public:
     static T convert_from_rational(const ET cofacet_diameter);
 
-    static std::vector<std::vector<T>> read_points(std::istream& input_stream) {
+    static std::vector<std::vector<T>> read_rat_points(std::istream& input_stream) {    //todo remove
         std::vector<std::vector<T>> points;
         std::string line;
         ET value;
@@ -1652,6 +1651,41 @@ public:
             }
             if (!point.empty()) points.push_back(point);
             assert(point.size() == points.front().size());
+        }
+        return points;
+    }
+
+    static std::vector<std::vector<T>> read_points(std::istream& input_stream) {
+        std::vector<std::vector<T>> points;
+        std::string line;
+        std::string entry;
+        ET value;
+        while (std::getline(input_stream, line)) {
+
+            std::vector<T> point;
+            std::istringstream s(line);
+
+            while (s >> entry) {
+                size_t pos = entry.find('.');
+                std::stringstream frac_string;
+                if(pos!= std::string::npos){
+                    std::string int_part = entry.substr(0, pos);
+                    std::string frac_part = entry.substr(pos+1);
+                    long numerator = std::stoi(int_part + frac_part);
+                    long denominator = 1;
+                    for (size_t i = 0; i < frac_part.length(); ++i) denominator *= 10;
+                    frac_string << numerator << '/' << denominator;
+                }
+                else{
+                    frac_string << entry << '/' << 1;
+                }
+                frac_string >> value;
+                point.push_back(convert_from_rational(value));
+                s.ignore();
+            }
+            if (!point.empty()) points.push_back(point);
+            assert(point.size() == points.front().size());
+
         }
         return points;
     }
