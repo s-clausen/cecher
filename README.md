@@ -53,6 +53,25 @@ make
 Adapt preprocessor macros and program arguments to your needs.
 
 
+### Experiments
+
+The following results were obtained on a desktop computer with a 3.4GHz Intel Xeon E3 1231
+v3 Server CPU and 16 GB 1,600MHz DDR3 RAM. The number of points is denoted by n, the maximal degree of homology to be computed is denoted by k,
+and the ambient dimension is denoted by d. Empty entries correspond to RAM usage beyond 12GB.
+
+| data	|	n	| d	 | k	 |Dionysus	 |GUDHI		 |Cecher	  |
+| :-------------:	|	:-------------:	| :-------------: | :-------------: |:-------------: |:-------------: |:-------------: |
+|random_60 |	300|	60|	1|	132.6s, 992MB|	16.7s, 5.4GB|	3.8s, 13MB|
+|torus	|	800	|4|	1|	|			|	11s, 372MB |
+|circle	|	300	|2	|1	|120.9s, 910MB	|5.6s, 523MB	|0.4s, 17MB |
+|circle_60	|600	|60|	1	|	|		|	2.9s, 135MB|
+|random_20 |	100|	20|	2	|101.9s, 902MB	|13.6s, 2.2GB|	49.7s, 10MB|
+|random | 	200	|3	|2|		|	111.6s, 4.9GB|	2.5s, 6MB|
+|torus_small |	100	|4	|2|	396.8s, 903MB|	7.1s, 544MB|	1.3s, 8MB|
+|sphere_60 |	200	|60|	2|		|	167.9s, 11.4GB|	6.9s, 16MB|
+
+
+
 ### Credits 
 
 Thank you to Ulrich Bauer and Fabian Roll for their contributions.
