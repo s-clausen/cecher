@@ -1,6 +1,6 @@
 ![Cecher](logo.png)
 
-Copyright © 08.07.2023 Sönke Clausen
+Copyright © 2023 Sönke Clausen
 
 The Cecher is a C++ software for efficient computation of Čech persistence barcodes outperforming current software ([Dionysus], [GUDHI]). Its main features are:
 
@@ -74,7 +74,7 @@ and the ambient dimension is denoted by d. Empty entries correspond to RAM usage
 
 ### Credits 
 
-Thank you to Ulrich Bauer and Fabian Roll for their contributions.
+The Cecher and its concepts are the result of a Master's thesis advised by [Ulrich Bauer] and [Fabian Roll]. The theory can be found here: *coming soon*.
 
 
 [Ripser]: <https://github.com/Ripser/ripser>
@@ -83,5 +83,6 @@ Thank you to Ulrich Bauer and Fabian Roll for their contributions.
 [GUDHI]: <https://gudhi.inria.fr/>
 [Miniball]: <https://people.inf.ethz.ch/gaertner/subdir/software/miniball.html>
 [examples]: <https://github.com/s-clausen/cecher/tree/main/examples>
-
+[Ulrich Bauer]: <https://ulrich-bauer.org>
+[Fabian Roll]: <https://www.roll.science/research>
 
