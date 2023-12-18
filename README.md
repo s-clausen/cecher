@@ -74,7 +74,7 @@ and the ambient dimension is denoted by d. Empty entries correspond to RAM usage
 
 ### Credits 
 
-The Cecher and its concepts are the result of a Master's thesis advised by [Ulrich Bauer] and [Fabian Roll]. The theory can be found here: *coming soon*.
+The Cecher and its concepts are the result of a thesis advised by [Ulrich Bauer] and [Fabian Roll]. The theory can be found here: *coming soon*.
 
 
 [Ripser]: <https://github.com/Ripser/ripser>
